@@ -12,9 +12,14 @@ using namespace std;
 #define DEFAULT_LIVES  3
 #define DEFAULT_RADIUS 20
 #define INVINCIBLE_TIME 2000
-#define DELTA_ANGLE 10.0
+#define DELTA_ANGLE 3.0
 #define VELOCITY 230
 #define ACCELERATION 130
+
+#define MOVE_FOWARD   0
+#define MOVE_BACKWARD 1
+#define MOVE_RIGHT    2
+#define MOVE_LEFT     3
 
 #define PI 3.14159265358979323846
 #define deg_to_rad(a) a/180*PI
@@ -45,6 +50,7 @@ class Player{
 
                 int lives;
                 bool invincible;
+                bool state[4] = {0, 0, 0, 0};
                 Timer invincible_timer;
 };
 

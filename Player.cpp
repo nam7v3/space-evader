@@ -21,58 +21,37 @@ Player::Player(){
 };
 
 void Player::handle_event(SDL_Event &e){
-        /* if(keyboard[SDLK_a]){ */
-        /*         turn(-DELTA_ANGLE); */
-        /* } */
-        /* if(keyboard[SDLK_d]){ */
-        /*         turn(DELTA_ANGLE); */
-        /* } */
-        /* if(keyboard[SDLK_w]){ */
-        /*         move_backward(); */
-        /* } */
-        /* if(keyboard[SDLK_s]){ */
-        /*         move_backward(); */
-        /* } */
-        auto keyboard = SDL_GetKeyboardState(NULL);
-        if(e.type == SDL_KEYDOWN || e.type == SDL_KEYUP){
-        switch (e.key.keysym.sym){
-                case SDLK_d:
-                        turn(DELTA_ANGLE);
-                        /* if(keyboard[SDLK_w]){ */
-                        /*         move_foward(); */
-                        /* } */
-                        /* if(keyboard[SDLK_s]){ */
-                        /*         move_backward(); */
-                        /* } */
-                        break;
-                case SDLK_a:
-                        turn(-DELTA_ANGLE);
-                        /* if(keyboard[SDLK_w]){ */
-                        /*         move_foward(); */
-                        /* } */
-                        /* if(keyboard[SDLK_s]){ */
-                        /*         move_backward(); */
-                        /* } */
-                        break;
-                case SDLK_w:
-                        move_foward();
-                        /* if(keyboard[SDLK_a]){ */
-                        /*         turn(-DELTA_ANGLE); */
-                        /* } */
-                        /* if(keyboard[SDLK_d]){ */
-                        /*         turn(DELTA_ANGLE); */
-                        /* } */
-                        break;
-                case SDLK_s:
-                        move_backward();
-                        /* if(keyboard[SDLK_a]){ */
-                        /*         turn(-DELTA_ANGLE); */
-                        /* } */
-                        /* if(keyboard[SDLK_d]){ */
-                        /*         turn(DELTA_ANGLE); */
-                        /* } */
-                        break;
-                }
+        if(e.type == SDL_KEYDOWN){
+                switch (e.key.keysym.sym){
+                        case SDLK_d:
+                                state[MOVE_RIGHT] = true;
+                                break;
+                        case SDLK_a:
+                                state[MOVE_LEFT] = true;
+                                break;
+                        case SDLK_w:
+                                state[MOVE_FOWARD] = true;
+                                break;
+                        case SDLK_s:
+                                state[MOVE_BACKWARD] = true;
+                                break;
+                        }
+        }
+        if(e.type == SDL_KEYUP){
+                switch (e.key.keysym.sym){
+                        case SDLK_d:
+                                state[MOVE_RIGHT] = false;
+                                break;
+                        case SDLK_a:
+                                state[MOVE_LEFT] = false;
+                                break;
+                        case SDLK_w:
+                                state[MOVE_FOWARD] = false;
+                                break;
+                        case SDLK_s:
+                                state[MOVE_BACKWARD] = false;
+                                break;
+                        }
         }
 };
 
@@ -121,6 +100,11 @@ void Player::move_backward(){
         ay = dy * ACCELERATION;
 }
 void Player::update(float t){
+        if(state[MOVE_FOWARD])move_foward();
+        if(state[MOVE_BACKWARD])move_backward();
+        if(state[MOVE_LEFT])turn(-DELTA_ANGLE);
+        if(state[MOVE_RIGHT])turn(DELTA_ANGLE);
+
         if (vx * (vx + ax * t) < 0){
                 vx = 0;
                 ax = 0;
