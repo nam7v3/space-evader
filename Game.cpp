@@ -1,5 +1,4 @@
 #include "Game.h"
-
 Game::Game(){
         running = true;
         if(SDL_Init(SDL_INIT_VIDEO) < 0){
@@ -41,8 +40,8 @@ Game::Game(){
 
 Game::~Game(){
         SDL_DestroyTexture(player_texture);
-        /* SDL_DestroyTexture(asteroid_texture); */
-        /* SDL_DestroyTexture(background_texture); */
+        SDL_DestroyTexture(asteroid_texture);
+        SDL_DestroyTexture(background_texture);
         SDL_DestroyWindow(window);
         SDL_Quit();
         IMG_Quit();
@@ -69,25 +68,15 @@ void Game::new_game(){
         Timer timer(1500);
         Player player;
         AsteroidHandler asteroids;
-        const Uint8* keyboard = SDL_GetKeyboardState(NULL);
 
         float elapsed;
         bool tm = true;
 
         SDL_ShowCursor(SDL_DISABLE);
         timer.start();
-
         while(true){
                 current = timer.get_ticks();
                 while(SDL_PollEvent(&e)){
-                        switch(e.type) {
-                                case SDL_KEYDOWN:
-                                        cout << "KEY_DOWN!\n";
-                                        break;
-                                case SDL_KEYUP:
-                                        cout << "KEY_UP!\n";
-                                        break;
-                        }
                         if(e.type == SDL_QUIT){
                                 return;
                         }
