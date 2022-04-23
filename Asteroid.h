@@ -7,6 +7,7 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 
+#include "Player.h"
 #include "Game.h"
 using namespace std;
 
@@ -37,6 +38,7 @@ class AsteroidHandler{
 
                 void render(SDL_Renderer *r, SDL_Texture *t);
                 void update(float time);
+                const list<Asteroid>& get_list();
         private:
                 list<Asteroid> asteroids;
                 int asteroid_num = 0;

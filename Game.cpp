@@ -92,14 +92,20 @@ void Game::new_game(){
 
                 for(int i = 0; i < timer.time_interval_elapsed(); ++i)
                         asteroids.add_rand_asteroid();
-                /* if(!player.is_invincible()){ */
-                        /* for(auto &a: *asteroids.getList()){ */
-                        /*         if((a.pos.x - player.pos.x) * (a.pos.x - pos.x) +  (a->pos.y - pos.y) * (a->pos.y - pos.y) < (a->radius + radius) * (a->radius + radius)){ */
-                        /*         } */
-                        /* } */
-                        /* if(player.outOfLives())break; */
-                        /* player.hitted(); */
-                /* } */
+
+                if(!player.is_invincible()){
+                        float player_px = player.get_px();
+                        float player_py = player.get_py();
+                        int player_radius = player.get_radius();
+
+                        for(auto &a: asteroids.get_list()){
+                                if((a.px - player_px) * (a.px - player_px) + \
+                                   (a.py - player_py) * (a.py - player_py) < \
+                                   (a.radius + player_radius) * (a.radius + player_radius))
+                                        player.hit();
+                        }
+                        if(player.dead())break;
+                }
 
                 elapsed = tick_to_sec(SDL_GetTicks() - current);
 

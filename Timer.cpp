@@ -2,8 +2,8 @@
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
 
-Timer::Timer(Uint32 t): interval(t), start_ticks(0), paused_ticks(0), time_slot(0){};
-Timer::Timer(): interval(0), start_ticks(0), paused_ticks(0), time_slot(0){};
+Timer::Timer(Uint32 t): interval(t), start_ticks(0), paused_ticks(0), time_slot(0), started(false), paused(false){};
+Timer::Timer(): interval(0), start_ticks(0), paused_ticks(0), time_slot(0), started(false), paused(false){};
 
 void Timer::start(){
         started = true;

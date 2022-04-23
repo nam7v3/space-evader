@@ -33,10 +33,17 @@ class Player{
                 void move_foward();
                 void move_backward();
 
-                bool is_invincible();
+                void toggle_invincible();
                 void hit();
                 bool dead();
 
+                bool is_invincible();
+
+                const float get_px();
+                const float get_py();
+                const float get_vx();
+                const float get_vy();
+                const int get_radius();
                 void update(float t);
 
                 void render(SDL_Renderer *r, SDL_Texture *t);
@@ -49,7 +56,6 @@ class Player{
                 float angle;
 
                 int lives;
-                bool invincible;
                 bool state[4] = {0, 0, 0, 0};
                 Timer invincible_timer;
 };

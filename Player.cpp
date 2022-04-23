@@ -16,8 +16,6 @@ Player::Player(){
         angle = 0;
 
         lives = 3;
-        invincible = false;
-
 };
 
 void Player::handle_event(SDL_Event &e){
@@ -55,17 +53,28 @@ void Player::handle_event(SDL_Event &e){
         }
 };
 
+void Player::toggle_invincible(){
+        if(is_invincible()){
+                invincible_timer.stop();
+        }else {
+                invincible_timer.start();
+        }
+}
+
 bool Player::is_invincible(){
         if(invincible_timer.get_ticks() < INVINCIBLE_TIME && invincible_timer.is_started()) {
-                invincible_timer.stop();
+                cout << "INVINCIBLE\n";
                 return true;
         }
+        cout << "NOT INVINCIBLE\n";
         return false;
 }
 
 void Player::hit(){
-        invincible_timer.start();
-        lives--;
+        if(!is_invincible()){
+                toggle_invincible();
+                lives--;
+        }
 }
 
 bool Player::dead(){
@@ -80,7 +89,6 @@ void Player::turn(float delta_angle){
 
         dx = tempx;
         dy = tempy;
-
         angle += delta_angle;
         if(angle > 360.0) angle -= 360;
         if(angle < 0.0) angle += 360;
@@ -99,6 +107,7 @@ void Player::move_backward(){
         ax = dx * ACCELERATION;
         ay = dy * ACCELERATION;
 }
+
 void Player::update(float t){
         if(state[MOVE_FOWARD])move_foward();
         if(state[MOVE_BACKWARD])move_backward();
@@ -116,6 +125,24 @@ void Player::update(float t){
 
         if(px + vx * t + radius < GAME_WIDTH && px + vx * t - radius > 0) px = px + vx * t;
         if(py + vy * t + radius < GAME_HEIGHT && py + vy * t - radius > 0) py = py + vy * t;
+}
+
+const float Player::get_px(){
+        return px;
+}
+
+const float Player::get_py(){
+        return py;
+}
+const float Player::get_vx(){
+        return vx;
+}
+
+const float Player::get_vy(){
+        return vy;
+}
+const int Player::get_radius(){
+        return radius;
 }
 
 void Player::render(SDL_Renderer *renderer, SDL_Texture *texture){

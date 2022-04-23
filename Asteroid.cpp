@@ -61,6 +61,10 @@ void AsteroidHandler::add_asteroid(Asteroid a){
         asteroids.push_back(a);
 }
 
+const list<Asteroid>& AsteroidHandler::get_list(){
+        return asteroids;
+}
+
 void AsteroidHandler::update(float t){
         stack<pair<Asteroid &, Asteroid &>> collide_pair;
         float dis, overlap;
