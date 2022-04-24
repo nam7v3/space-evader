@@ -63,16 +63,15 @@ void Player::toggle_invincible(){
 
 bool Player::is_invincible(){
         if(invincible_timer.get_ticks() < INVINCIBLE_TIME && invincible_timer.is_started()) {
-                cout << "INVINCIBLE\n";
                 return true;
         }
-        cout << "NOT INVINCIBLE\n";
         return false;
 }
 
 void Player::hit(){
         if(!is_invincible()){
                 toggle_invincible();
+                explosion = 0;
                 lives--;
         }
 }
@@ -134,6 +133,7 @@ const float Player::get_px(){
 const float Player::get_py(){
         return py;
 }
+
 const float Player::get_vx(){
         return vx;
 }
@@ -141,20 +141,36 @@ const float Player::get_vx(){
 const float Player::get_vy(){
         return vy;
 }
+
 const int Player::get_radius(){
         return radius;
 }
 
-void Player::render(SDL_Renderer *renderer, SDL_Texture *player_texture, SDL_Texture *arrow_texture){
+void Player::render(SDL_Renderer *renderer, SDL_Texture *player_texture, SDL_Texture *arrow_texture, SDL_Texture *explosion_texture){
         SDL_Rect player_dst = {(int)px - radius, (int)py - radius, radius * 2 , radius * 2};
         SDL_Rect arrow_dst = {(int)px + (int)(dx * 100) - 24, (int)py + (int)(dy * 100) - 12, 48, 24};
+        SDL_Rect src = {(3 - lives) * 85, 0, 85, 87};
 
+        if(is_invincible()){
+                SDL_SetTextureAlphaMod(player_texture, 50);
+        }else {
+                SDL_SetTextureAlphaMod(player_texture, 255);
+        }
+        if(SDL_RenderCopyEx(renderer, player_texture, &src, &player_dst, angle, NULL, SDL_FLIP_NONE) < 0){
+                cerr << "Couldn't render player" <<  SDL_GetError();
+        }
 
         if(SDL_RenderCopyEx(renderer, arrow_texture, NULL, &arrow_dst, angle, NULL, SDL_FLIP_NONE) < 0){
                 cerr << "Couldn't render player" <<  SDL_GetError();
         }
-
-        if(SDL_RenderCopyEx(renderer, player_texture, NULL, &player_dst, angle, NULL, SDL_FLIP_NONE) < 0){
-                cerr << "Couldn't render player" <<  SDL_GetError();
+        if(explosion >= 0){
+                SDL_Rect dat = {explosion * 96, 0 , 96, 96};
+                SDL_Rect dis = {(int)px - 100, (int)py -100 , 200, 200};
+                if(SDL_RenderCopy(renderer, explosion_texture, &dat, &dis) < 0){
+                        cerr << "Couldn't render player" <<  SDL_GetError();
+                }
+                cout << explosion << '\n' ;
+                if(explosion == 11) explosion = -1;
+                else explosion++;
         }
 };

@@ -12,7 +12,7 @@
 using namespace std;
 
 #define DEFAULT_ASTEROID_RADIUS 60
-#define ASTEROID_SPEED 200
+#define ASTEROID_SPEED 700
 #define PADDING 100
 
 #define collide(a,b) ((a.px-b.px)*(a.px-b.px)+(a.py-b.py)*(a.py-b.py)<(a.radius+b.radius)*(a.radius+b.radius))

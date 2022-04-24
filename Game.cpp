@@ -26,7 +26,7 @@ Game::Game(){
                 cerr << "Failed to load texture:" << SDL_GetError();
                 exit(1);
         }
-        player_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/earth.png");
+        player_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/sprite.png");
         if(!player_texture){
                 cerr << "Failed to load texture:" << SDL_GetError();
                 exit(1);
@@ -38,6 +38,11 @@ Game::Game(){
         }
         arrow_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/arrow.png");
         if(!arrow_texture){
+                cerr << "Failed to load texture:" << SDL_GetError();
+                exit(1);
+        }
+        explosion_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/explosion.png");
+        if(!background_texture){
                 cerr << "Failed to load texture:" << SDL_GetError();
                 exit(1);
         }
@@ -93,7 +98,7 @@ void Game::new_game(){
                 SDL_RenderClear(renderer);
                 SDL_RenderCopy(renderer, background_texture, NULL, NULL);
                 asteroids.render(renderer, asteroid_texture);
-                player.render(renderer, player_texture, arrow_texture);
+                player.render(renderer, player_texture, arrow_texture ,explosion_texture);
                 SDL_RenderPresent(renderer);
 
                 for(int i = 0; i < timer.time_interval_elapsed(); ++i)
@@ -105,6 +110,7 @@ void Game::new_game(){
                 float player_py = player.get_py();
                 int player_radius = player.get_radius();
 
+                player.is_invincible();
                 for(auto &a: asteroids.get_list()){
                         if((a.px - player_px) * (a.px - player_px) + (a.py - player_py) * (a.py - player_py) < (a.radius + player_radius) * (a.radius + player_radius)){
                                 player.hit();
@@ -131,6 +137,6 @@ void Game::new_game(){
                         timer.set_interval(1000);
                         tm =false;
                 }
-                SDL_Delay(10);
+                SDL_Delay(30);
         }
 }

@@ -15,7 +15,7 @@ void AsteroidHandler::add_rand_asteroid(){
         a.radius = rand() % DEFAULT_ASTEROID_RADIUS + 20;
         a.angle = 0;
         a.speed = ASTEROID_SPEED;
-        a.delta_angle = rand() % 2 ? -2.0 : 2.0;
+        a.delta_angle = (rand() % 2 ? -1.0 : 1.0) * 10.0f / a.radius ;
 
         randid = rand() % 4;
 

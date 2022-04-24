@@ -35,7 +35,7 @@ class Game {
                 SDL_Window *window;
                 SDL_Renderer *renderer;
                 SDL_Texture *player_texture, *asteroid_texture, \
-                        *menu_texture, *background_texture, *arrow_texture;
+                        *menu_texture, *background_texture, *arrow_texture, *explosion_texture;
 
                 bool running;
 };
