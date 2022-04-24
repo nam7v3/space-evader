@@ -8,7 +8,7 @@ Player::Player(){
         px = GAME_WIDTH * 0.5f;
         py = GAME_HEIGHT * 0.5f;
 
-        dx = 1.0; dy = 0.0;
+        dx = 0.0; dy = -1.0;
         vx = 0.0; vy = 0.0;
         ax = 0.0; ay = 0.0;
 
@@ -145,10 +145,16 @@ const int Player::get_radius(){
         return radius;
 }
 
-void Player::render(SDL_Renderer *renderer, SDL_Texture *texture){
-        SDL_Rect dst = {(int)px - radius, (int)py - radius, radius * 2 , radius * 2};
+void Player::render(SDL_Renderer *renderer, SDL_Texture *player_texture, SDL_Texture *arrow_texture){
+        SDL_Rect player_dst = {(int)px - radius, (int)py - radius, radius * 2 , radius * 2};
+        SDL_Rect arrow_dst = {(int)px + (int)(dx * 100) - 24, (int)py + (int)(dy * 100) - 12, 48, 24};
 
-        if(SDL_RenderCopyEx(renderer, texture, NULL, &dst, angle, NULL, SDL_FLIP_NONE) < 0){
+
+        if(SDL_RenderCopyEx(renderer, arrow_texture, NULL, &arrow_dst, angle, NULL, SDL_FLIP_NONE) < 0){
+                cerr << "Couldn't render player" <<  SDL_GetError();
+        }
+
+        if(SDL_RenderCopyEx(renderer, player_texture, NULL, &player_dst, angle, NULL, SDL_FLIP_NONE) < 0){
                 cerr << "Couldn't render player" <<  SDL_GetError();
         }
 };

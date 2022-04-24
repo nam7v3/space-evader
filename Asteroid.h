@@ -38,7 +38,7 @@ class AsteroidHandler{
 
                 void render(SDL_Renderer *r, SDL_Texture *t);
                 void update(float time);
-                const list<Asteroid>& get_list();
+                list<Asteroid>& get_list();
         private:
                 list<Asteroid> asteroids;
                 int asteroid_num = 0;

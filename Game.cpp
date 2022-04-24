@@ -21,12 +21,12 @@ Game::Game(){
                 cerr << "Failed to create renderer:" << SDL_GetError();
                 exit(1);
         }
-        asteroid_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/asteroid.png");
+        asteroid_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/asteroid4.png");
         if(!asteroid_texture){
                 cerr << "Failed to load texture:" << SDL_GetError();
                 exit(1);
         }
-        player_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/arrow.png");
+        player_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/earth.png");
         if(!player_texture){
                 cerr << "Failed to load texture:" << SDL_GetError();
                 exit(1);
@@ -36,6 +36,12 @@ Game::Game(){
                 cerr << "Failed to load texture:" << SDL_GetError();
                 exit(1);
         }
+        arrow_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/arrow.png");
+        if(!arrow_texture){
+                cerr << "Failed to load texture:" << SDL_GetError();
+                exit(1);
+        }
+
 }
 
 Game::~Game(){
@@ -87,25 +93,33 @@ void Game::new_game(){
                 SDL_RenderClear(renderer);
                 SDL_RenderCopy(renderer, background_texture, NULL, NULL);
                 asteroids.render(renderer, asteroid_texture);
-                player.render(renderer, player_texture);
+                player.render(renderer, player_texture, arrow_texture);
                 SDL_RenderPresent(renderer);
 
                 for(int i = 0; i < timer.time_interval_elapsed(); ++i)
                         asteroids.add_rand_asteroid();
 
-                if(!player.is_invincible()){
-                        float player_px = player.get_px();
-                        float player_py = player.get_py();
-                        int player_radius = player.get_radius();
+                // Player-Asteroid collision
 
-                        for(auto &a: asteroids.get_list()){
-                                if((a.px - player_px) * (a.px - player_px) + \
-                                   (a.py - player_py) * (a.py - player_py) < \
-                                   (a.radius + player_radius) * (a.radius + player_radius))
-                                        player.hit();
+                float player_px = player.get_px();
+                float player_py = player.get_py();
+                int player_radius = player.get_radius();
+
+                for(auto &a: asteroids.get_list()){
+                        if((a.px - player_px) * (a.px - player_px) + (a.py - player_py) * (a.py - player_py) < (a.radius + player_radius) * (a.radius + player_radius)){
+                                player.hit();
+
+                                float dis = sqrt((a.px - player_px) * (a.px - player_px) + (a.py - player_py) * (a.py - player_py));
+
+                                a.px += (a.radius + player_radius - dis)* (a.px - player_px) / dis;
+                                a.py += (a.radius + player_radius - dis) * (a.py - player_py) / dis;
+
+                                a.vx = (a.px - player_px) * 5;
+                                a.vy = (a.py - player_py) * 5;
                         }
-                        if(player.dead())break;
+
                 }
+                if(player.dead())break;
 
                 elapsed = tick_to_sec(SDL_GetTicks() - current);
 

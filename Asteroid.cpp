@@ -1,4 +1,6 @@
 #include "Asteroid.h"
+#include "Game.h"
+#include <SDL2/SDL_render.h>
 
 
 bool outside(const Asteroid &a){
@@ -23,7 +25,6 @@ void AsteroidHandler::add_rand_asteroid(){
                 a.py = rand() % GAME_HEIGHT;
                 a.vx = -1.0f * a.speed;
                 a.vy = 1.0f / (std::rand() % 5 + 1) * a.speed;
-                /* cout << "RIGHT!\n"; */
         }
         if(randid == 1){
                 // Spawn an asteroid on left border
@@ -31,7 +32,6 @@ void AsteroidHandler::add_rand_asteroid(){
                 a.py = rand() % GAME_HEIGHT;
                 a.vx = 1.0f * ASTEROID_SPEED;
                 a.vy = 1.0f / (rand() % 5 + 1) * a.speed;
-                /* cout << "LEFT!\n"; */
         }
         if(randid == 2){
                 // Spawn an asteroid on bottom border
@@ -39,7 +39,6 @@ void AsteroidHandler::add_rand_asteroid(){
                 a.py = GAME_HEIGHT + PADDING;
                 a.vx = 1.0f / (rand() % 5 + 1) * a.speed;
                 a.vy = -1.0f * a.speed;
-                /* cout << "BOTTOM! : "; */
         }
         if(randid == 3){
                 // Spawn an asteroid on top border
@@ -47,13 +46,10 @@ void AsteroidHandler::add_rand_asteroid(){
                 a.py = - PADDING;
                 a.vx = 1.0f / (rand() % 5) * a.speed;
                 a.vy = 1.0f * a.speed;
-                /* cout << "UP!\n"; */
         }
 
-        /* a.id = std::rand() % ASTEROID_TYPE; */
-        a.id = asteroid_num ++;
+        a.id = ++asteroid_num;
 
-        /* cout << "Spawning a random asteroid!\n"; */
         asteroids.push_back(a);
 };
 
@@ -61,7 +57,7 @@ void AsteroidHandler::add_asteroid(Asteroid a){
         asteroids.push_back(a);
 }
 
-const list<Asteroid>& AsteroidHandler::get_list(){
+list<Asteroid>& AsteroidHandler::get_list(){
         return asteroids;
 }
 
@@ -81,7 +77,6 @@ void AsteroidHandler::update(float t){
                                 b.px += overlap * (a.px - b.px) / dis;
                                 b.py += overlap * (a.py - b.py) / dis;
 
-                                cout << a.id << " " << b.id << endl;
                                 collide_pair.push({a, b});
                         }
                 }
@@ -91,22 +86,6 @@ void AsteroidHandler::update(float t){
                 Asteroid &b = collide_pair.top().second;
 
                 dis = distance(a, b);
-
-/*                 float nx = (b.px - a.px) / dis; */
-/*                 float ny = (b.py - a.py) / dis; */
-
-/*                 float tx = -ny; */
-/*                 float ty = nx; */
-
-/*                 float dpTan1 = a.vx * tx + a.vy * ty; */
-/*                 float dpTan2 = b.vx * tx + b.vy * ty; */
-
-/*                 float dpNorm1 = a.vx * nx + a.vy * ny; */
-/*                 float dpNorm2 = b.vx * nx + b.vy * ny; */
-
-/*                 float m1 = (dpNorm1 * (a.radius - b.radius) + 2.0f * b.radius * dpNorm2) / (a.radius + b.radius); */
-/*                 float m2 = (dpNorm2 * (b.radius - a.radius) + 2.0f * a.radius * dpNorm1) / (a.radius + b.radius); */
-
 
                 float nx = (b.px - a.px) / dis;
                 float ny = (b.py - a.py) / dis;
@@ -133,17 +112,18 @@ void AsteroidHandler::update(float t){
 }
 
 void AsteroidHandler::render(SDL_Renderer *renderer, SDL_Texture *texture){
-        SDL_Rect dst, src;
+        SDL_Rect dst;
         if(!renderer || !texture){
                 return;
         }
         for(auto& a: asteroids){
-                dst.x = a.px - a.radius;
+                dst.x = a.px - a.radius ;
                 dst.y = a.py - a.radius;
-                dst.w = a.radius * 2;
-                dst.h = a.radius * 2;
+                dst.w = a.radius * 2 ;
+                dst.h = a.radius * 2 ;
+
                 if(SDL_RenderCopyEx(renderer, texture, NULL, &dst, a.angle, NULL, SDL_FLIP_NONE) < 0){
-                        cerr << "Could't render circle" << SDL_GetError();
+                        cerr << "Could't render asteroid" << SDL_GetError();
                 }
         }
 }

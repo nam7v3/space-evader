@@ -10,7 +10,7 @@
 using namespace std;
 
 #define DEFAULT_LIVES  3
-#define DEFAULT_RADIUS 20
+#define DEFAULT_RADIUS 30
 #define INVINCIBLE_TIME 2000
 #define DELTA_ANGLE 3.0
 #define VELOCITY 230
@@ -46,12 +46,13 @@ class Player{
                 const int get_radius();
                 void update(float t);
 
-                void render(SDL_Renderer *r, SDL_Texture *t);
+                void render(SDL_Renderer *r, SDL_Texture *p, SDL_Texture *a);
         private:
                 float px, py; // Position of player
                 float dx, dy; // Direction player pointing to
                 float vx, vy; // Velocity of player
                 float ax, ay; // Acceleration of player
+
                 int radius;
                 float angle;
 
