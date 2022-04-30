@@ -1,63 +1,4 @@
 #include "Game.h"
-Game::Game(){
-        running = true;
-        if(SDL_Init(SDL_INIT_VIDEO) < 0){
-                cerr << "SDL couldn't be initialized:" << SDL_GetError();
-                exit(1);
-        }
-
-        if((IMG_Init(IMG_INIT_PNG)&IMG_INIT_PNG) != IMG_INIT_PNG){
-                cerr << "SDL_image couldn't be initialized:" << IMG_GetError();
-                exit(1);
-        }
-        window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        if(!window){
-                cerr << "Window couldn't be initialized:" << SDL_GetError();
-                exit(1);
-        }
-
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        if(!renderer){
-                cerr << "Failed to create renderer:" << SDL_GetError();
-                exit(1);
-        }
-        asteroid_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/asteroid4.png");
-        if(!asteroid_texture){
-                cerr << "Failed to load texture:" << SDL_GetError();
-                exit(1);
-        }
-        player_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/sprite.png");
-        if(!player_texture){
-                cerr << "Failed to load texture:" << SDL_GetError();
-                exit(1);
-        }
-        background_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/background.png");
-        if(!background_texture){
-                cerr << "Failed to load texture:" << SDL_GetError();
-                exit(1);
-        }
-        arrow_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/arrow.png");
-        if(!arrow_texture){
-                cerr << "Failed to load texture:" << SDL_GetError();
-                exit(1);
-        }
-        explosion_texture = loadTexture(renderer, "/home/kieu/courses/LTNC/space-evader/explosion.png");
-        if(!background_texture){
-                cerr << "Failed to load texture:" << SDL_GetError();
-                exit(1);
-        }
-
-}
-
-Game::~Game(){
-        SDL_DestroyTexture(player_texture);
-        SDL_DestroyTexture(asteroid_texture);
-        SDL_DestroyTexture(background_texture);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        IMG_Quit();
-}
-
 
 SDL_Texture* loadTexture(SDL_Renderer* r, std::string path){
         SDL_Surface* surface = IMG_Load(path.c_str());
@@ -71,6 +12,54 @@ SDL_Texture* loadTexture(SDL_Renderer* r, std::string path){
         return texture;
 }
 
+Game::Game(){
+        running = true;
+        if(SDL_Init(SDL_INIT_VIDEO) < 0){
+                cerr << "SDL couldn't be initialized:" << SDL_GetError();
+                exit(1);
+        }
+
+        if((IMG_Init(IMG_INIT_PNG)&IMG_INIT_PNG) != IMG_INIT_PNG){
+                cerr << "SDL_image couldn't be initialized:" << IMG_GetError();
+                exit(1);
+        }
+        window = SDL_CreateWindow("Space Evader", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        if(!window){
+                cerr << "Window couldn't be initialized:" << SDL_GetError();
+                exit(1);
+        }
+
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+        if(!renderer){
+                cerr << "Failed to create renderer:" << SDL_GetError();
+                exit(1);
+        }
+        for(int i = 0; i < TEXTURE_NUM; ++i){
+                textures[i] = loadTexture(renderer, resources_path + to_string(i) + ".png");
+                if(!textures[i]){
+                        cerr << "Failed to load texture:" << SDL_GetError();
+                        exit(1);
+                }
+        }
+}
+
+Game::~Game(){
+        for(int i = 0; i < TEXTURE_NUM; ++i){
+                SDL_DestroyTexture(textures[i]);
+        }
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        IMG_Quit();
+}
+
+void Game::main_menu(){
+        while(true){
+                while(SDL_WaitEvent(&e)){
+                        if(e.type == SDL_QUIT){
+                                return;
+                        }
+        }
+}
 void Game::new_game(){
         srand(time(NULL));
 
@@ -82,6 +71,7 @@ void Game::new_game(){
 
         float elapsed;
         bool tm = true;
+        point = 0;
 
         SDL_ShowCursor(SDL_DISABLE);
         timer.start();
@@ -96,9 +86,20 @@ void Game::new_game(){
 
 
                 SDL_RenderClear(renderer);
-                SDL_RenderCopy(renderer, background_texture, NULL, NULL);
-                asteroids.render(renderer, asteroid_texture);
-                player.render(renderer, player_texture, arrow_texture ,explosion_texture);
+
+                // Draw the border
+
+                // Draw the gaming screen
+                SDL_RenderSetViewport(renderer, &game_screen);
+
+                SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xff);
+                SDL_RenderDrawRect(renderer, NULL);
+                SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+                // Background
+                SDL_RenderCopy(renderer, textures[TEXTURE_BACKGROUND], NULL, NULL);
+                asteroids.render(renderer, textures[TEXTURE_ASTEROID]);
+                player.render(renderer, textures);
+
                 SDL_RenderPresent(renderer);
 
                 for(int i = 0; i < timer.time_interval_elapsed(); ++i)
@@ -135,7 +136,7 @@ void Game::new_game(){
                 // Stage 2
                 if(timer.get_ticks() > 30000 && tm){
                         timer.set_interval(1000);
-                        tm =false;
+                        tm = false;
                 }
                 SDL_Delay(30);
         }

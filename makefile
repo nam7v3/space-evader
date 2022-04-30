@@ -1,10 +1,12 @@
-OBJS= main.cpp Game.cpp Timer.cpp Player.cpp Asteroid.cpp
+SRC_DIR = src
+INCLUDE = include/
+TARGET = space-evader
+# SRC = $(wildcard $(SRC_DIR)/*.cpp)
+SRC = $(wildcard ${SRC_DIR}/*.cpp)
 CC = g++
-FLAGS = -Wall -w -g
+FLAGS = -w -Wall -g -O3 -I $(INCLUDE)
 LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
-OBJ_NAME = space-evader
 
-
-all: $(OBJS)
-	$(CC) $(FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME) $(OBJS)
+all:
+	$(CC) $(FLAGS) $(LINKER_FLAGS) -o $(TARGET) $(SRC)
 	./space-evader

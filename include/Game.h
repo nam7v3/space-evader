@@ -15,12 +15,26 @@ using namespace std;
 
 const int GAME_HEIGHT = 600;
 const int GAME_WIDTH = 600;
-const int SCREEN_HEIGHT = 600;
-const int SCREEN_WIDTH = 600;
+const int SCREEN_HEIGHT = 700;
+const int SCREEN_WIDTH = 700;
+
+const SDL_Rect game_screen = { \
+        (SCREEN_WIDTH - GAME_WIDTH)/2, \
+        (SCREEN_HEIGHT - GAME_HEIGHT)/2, \
+        GAME_WIDTH, \
+        GAME_HEIGHT \
+};
+
+#define TEXTURE_EXPLOSION   0
+#define TEXTURE_BACKGROUND  1
+#define TEXTURE_PLAYER      2
+#define TEXTURE_ARROW       3
+#define TEXTURE_ASTEROID    4
+#define TEXTURE_NUM         5
 
 const int FPS = 15;
 
-const string res_path = "/home/kieu/courses/LTNC/space-evader/resources";
+const string resources_path = "resources/";
 
 SDL_Texture* loadTexture(SDL_Renderer* r, string path);
 
@@ -34,8 +48,7 @@ class Game {
         private:
                 SDL_Window *window;
                 SDL_Renderer *renderer;
-                SDL_Texture *player_texture, *asteroid_texture, \
-                        *menu_texture, *background_texture, *arrow_texture, *explosion_texture;
-
+                SDL_Texture *textures[TEXTURE_NUM] = {NULL, NULL, NULL, NULL, NULL};
                 bool running;
+                int point = 0;
 };

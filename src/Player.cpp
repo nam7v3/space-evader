@@ -146,30 +146,35 @@ const int Player::get_radius(){
         return radius;
 }
 
-void Player::render(SDL_Renderer *renderer, SDL_Texture *player_texture, SDL_Texture *arrow_texture, SDL_Texture *explosion_texture){
+void Player::render(SDL_Renderer *renderer, SDL_Texture **textures){
         SDL_Rect player_dst = {(int)px - radius, (int)py - radius, radius * 2 , radius * 2};
         SDL_Rect arrow_dst = {(int)px + (int)(dx * 100) - 24, (int)py + (int)(dy * 100) - 12, 48, 24};
         SDL_Rect src = {(3 - lives) * 85, 0, 85, 87};
 
         if(is_invincible()){
-                SDL_SetTextureAlphaMod(player_texture, 50);
+                if(invincible_animation_state == 0){
+                        SDL_SetTextureAlphaMod(textures[TEXTURE_PLAYER], 50);
+                        invincible_animation_state = 1;
+                }else {
+                        SDL_SetTextureAlphaMod(textures[TEXTURE_PLAYER], 255);
+                        invincible_animation_state = 0;
+                }
         }else {
-                SDL_SetTextureAlphaMod(player_texture, 255);
+                SDL_SetTextureAlphaMod(textures[TEXTURE_PLAYER], 255);
         }
-        if(SDL_RenderCopyEx(renderer, player_texture, &src, &player_dst, angle, NULL, SDL_FLIP_NONE) < 0){
+        if(SDL_RenderCopyEx(renderer, textures[TEXTURE_PLAYER], &src, &player_dst, angle, NULL, SDL_FLIP_NONE) < 0){
                 cerr << "Couldn't render player" <<  SDL_GetError();
         }
 
-        if(SDL_RenderCopyEx(renderer, arrow_texture, NULL, &arrow_dst, angle, NULL, SDL_FLIP_NONE) < 0){
+        if(SDL_RenderCopyEx(renderer, textures[TEXTURE_ARROW], NULL, &arrow_dst, angle, NULL, SDL_FLIP_NONE) < 0){
                 cerr << "Couldn't render player" <<  SDL_GetError();
         }
         if(explosion >= 0){
                 SDL_Rect dat = {explosion * 96, 0 , 96, 96};
                 SDL_Rect dis = {(int)px - 100, (int)py -100 , 200, 200};
-                if(SDL_RenderCopy(renderer, explosion_texture, &dat, &dis) < 0){
+                if(SDL_RenderCopy(renderer, textures[TEXTURE_EXPLOSION], &dat, &dis) < 0){
                         cerr << "Couldn't render player" <<  SDL_GetError();
                 }
-                cout << explosion << '\n' ;
                 if(explosion == 11) explosion = -1;
                 else explosion++;
         }

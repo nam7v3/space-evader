@@ -14,7 +14,7 @@ using namespace std;
 #define INVINCIBLE_TIME 2000
 #define DELTA_ANGLE 4.0
 #define VELOCITY 1000
-#define ACCELERATION 500
+#define ACCELERATION 4500
 
 #define MOVE_FOWARD   0
 #define MOVE_BACKWARD 1
@@ -46,7 +46,7 @@ class Player{
                 const int get_radius();
                 void update(float t);
 
-                void render(SDL_Renderer *r, SDL_Texture *p, SDL_Texture *a, SDL_Texture *e);
+                void render(SDL_Renderer *r, SDL_Texture **textures);
         private:
                 float px, py; // Position of player
                 float dx, dy; // Direction player pointing to
@@ -56,7 +56,7 @@ class Player{
                 int radius;
                 float angle;
 
-                int invincible_animation_state = 0;
+                int invincible_animation_state= 0;
                 int explosion = -1;
 
                 int lives;
