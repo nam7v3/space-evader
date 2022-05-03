@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "../include/Player.h"
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keyboard.h>
 #include <SDL2/SDL_render.h>
@@ -143,6 +143,10 @@ const float Player::get_vy(){
 }
 
 const int Player::get_radius(){
+        return radius;
+}
+
+const int Player::get_lives(){
         return radius;
 }
 

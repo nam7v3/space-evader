@@ -1,4 +1,4 @@
-#include "Timer.h"
+#include "../include/Timer.h"
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
 
@@ -11,6 +11,7 @@ void Timer::start(){
         time_slot = 0;
         start_ticks = SDL_GetTicks();
         paused_ticks = 0;
+        mark_ticks = start_ticks;
 }
 void Timer::stop(){
         started = false;
@@ -32,6 +33,17 @@ void Timer::unpause(){
                 start_ticks = SDL_GetTicks() - paused_ticks;
                 paused_ticks = 0;
         }
+}
+
+void Timer::mark_timer(){
+        mark_ticks = get_ticks();
+        /* cout << mark_ticks << "\n"; */
+}
+
+float Timer::sec_since_mark(){
+        float sec;
+        sec = tick_to_sec(get_ticks() - mark_ticks);
+        return sec;
 }
 
 Uint32 Timer::get_ticks(){

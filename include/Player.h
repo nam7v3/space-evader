@@ -12,9 +12,9 @@ using namespace std;
 #define DEFAULT_LIVES  3
 #define DEFAULT_RADIUS 30
 #define INVINCIBLE_TIME 2000
-#define DELTA_ANGLE 4.0
-#define VELOCITY 1000
-#define ACCELERATION 4500
+#define DELTA_ANGLE 3.0
+#define VELOCITY 3.6
+#define ACCELERATION 0.05
 
 #define MOVE_FOWARD   0
 #define MOVE_BACKWARD 1
@@ -44,6 +44,8 @@ class Player{
                 const float get_vx();
                 const float get_vy();
                 const int get_radius();
+
+                const int get_lives();
                 void update(float t);
 
                 void render(SDL_Renderer *r, SDL_Texture **textures);

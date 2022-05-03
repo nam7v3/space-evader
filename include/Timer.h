@@ -1,7 +1,11 @@
 #pragma once
 #include <algorithm>
+#include <iostream>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
+using namespace std;
+
+#define tick_to_sec(a) (a) / 20.0f
 
 class Timer{
         public:
@@ -13,6 +17,9 @@ class Timer{
                 void pause();
                 void unpause();
 
+                void mark_timer();
+                float sec_since_mark();
+
                 Uint32 get_ticks();
                 int time_interval_elapsed();
 
@@ -23,6 +30,6 @@ class Timer{
         private:
                 bool started, paused;
                 int interval;
-                Uint32 start_ticks, paused_ticks, time_slot;
+                Uint32 start_ticks, paused_ticks, time_slot, mark_ticks;
 
 };
