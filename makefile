@@ -8,4 +8,3 @@ LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
 
 all:
 	$(CC) $(FLAGS) $(LINKER_FLAGS) -o $(TARGET) $(SRC)
-	./space-evader
