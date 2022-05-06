@@ -1,13 +1,9 @@
 #include "../include/Game.h"
-#include <SDL2/SDL_error.h>
-#include <SDL2/SDL_keycode.h>
-#include <SDL2/SDL_pixels.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_ttf.h>
 
 SDL_Texture* Game::load_img_texture(string path)
 {
-    if(renderer == NULL) return NULL;
+    if (renderer == NULL)
+        return NULL;
     SDL_Surface* surface = IMG_Load(path.c_str());
     SDL_Texture* texture = NULL;
     if (surface == NULL) {
@@ -19,6 +15,26 @@ SDL_Texture* Game::load_img_texture(string path)
     return texture;
 }
 
+int Game::render_text(string text, const SDL_Rect& dst)
+{
+    SDL_Texture* texture = load_text_texture(text);
+    SDL_RenderCopy(renderer, texture, NULL, &dst);
+    SDL_DestroyTexture(texture);
+    return 0;
+}
+
+SDL_Texture* Game::load_text_texture(string text)
+{
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), defautl_text_color);
+    SDL_Texture* texture = NULL;
+    if (surface == NULL) {
+        cerr << "Couldn't load text:" << TTF_GetError();
+        return NULL;
+    }
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return texture;
+}
 Game::Game()
 {
     running = true;
@@ -59,10 +75,18 @@ Game::Game()
     }
 
     // Import game textures
-    for (int i = 0; i < TEXTURE_NUM; ++i) {
-        textures[i] = load_img_texture(resources_path + to_string(i) + ".png");
-        if (!textures[i]) {
+    for (int i = 0; i < TEXTURE_IMG_NUM; ++i) {
+        textures_img[i] = load_img_texture(resources_path + to_string(i) + ".png");
+        if (!textures_img[i]) {
             cerr << "Failed to load texture:" << SDL_GetError();
+            exit(1);
+        }
+    }
+
+    for (int i = 0; i < TEXTURE_TEXT_NUM; ++i) {
+        textures_text[i] = load_text_texture(text[i]);
+        if (!textures_text[i]) {
+            cerr << "Failed to load text texture:" << SDL_GetError();
             exit(1);
         }
     }
@@ -70,8 +94,11 @@ Game::Game()
 
 Game::~Game()
 {
-    for (int i = 0; i < TEXTURE_NUM; ++i) {
-        SDL_DestroyTexture(textures[i]);
+    for (int i = 0; i < TEXTURE_IMG_NUM; ++i) {
+        SDL_DestroyTexture(textures_img[i]);
+    }
+    for (int i = 0; i < TEXTURE_TEXT_NUM; ++i) {
+        SDL_DestroyTexture(textures_text[i]);
     }
     SDL_DestroyWindow(window);
     IMG_Quit();
@@ -85,10 +112,10 @@ void Game::main_menu()
     SDL_Event e;
     while (running) {
         if (menu == MENU_PLAY)
-          SDL_RenderCopy(renderer, textures[TEXTURE_MENU], &texture_menu[MENU_PLAY],
+            SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_MENU], &texture_menu[MENU_PLAY],
                 NULL);
         else
-            SDL_RenderCopy(renderer, textures[TEXTURE_MENU], &texture_menu[MENU_QUIT],
+            SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_MENU], &texture_menu[MENU_QUIT],
                 NULL);
         SDL_RenderPresent(renderer);
         SDL_WaitEvent(&e);
@@ -96,6 +123,7 @@ void Game::main_menu()
             return;
         }
         if (e.type == SDL_KEYDOWN) {
+
             if (e.key.keysym.sym == SDLK_w) {
                 menu = MENU_PLAY;
             }
@@ -103,9 +131,10 @@ void Game::main_menu()
                 menu = MENU_QUIT;
             }
             if (e.key.keysym.sym == SDLK_RETURN) {
-                if (menu == MENU_PLAY)
+                if (menu == MENU_PLAY) {
+                    game_state = GAME_STATE_PLAYING;
                     new_game();
-                else
+                } else
                     return;
             }
         }
@@ -120,13 +149,10 @@ void Game::new_game()
     Timer timer(1500);
     Player player;
     AsteroidHandler asteroids;
-    SDL_Texture* text = NULL;
-    SDL_Surface* surface = NULL;
 
     float elapsed;
     int stage = 0;
     int score = 0;
-
 
     SDL_ShowCursor(SDL_DISABLE);
     timer.start();
@@ -136,35 +162,24 @@ void Game::new_game()
 
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
-              running = false;
+                running = false;
+            }
+            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) {
+                timer.pause();
+                pause();
+                timer.unpause();
             }
             player.handle_event(e);
         }
+        if (game_state == GAME_STATE_MENU)
+            return;
 
         // Add random asteroid in interval
         for (int i = 0; i < timer.time_interval_elapsed(); ++i)
             asteroids.add_rand_asteroid();
 
+        player.check_asteroid_collision(asteroids.get_list());
 
-        // Player-Asteroid collision
-        float player_px = player.get_px();
-        float player_py = player.get_py();
-        int player_radius = player.get_radius();
-
-        player.is_invincible();
-        for (auto& a : asteroids.get_list()) {
-            if ((a.px - player_px) * (a.px - player_px) + (a.py - player_py) * (a.py - player_py) < (a.radius + player_radius) * (a.radius + player_radius)) {
-                player.hit();
-
-                float dis = sqrt((a.px - player_px) * (a.px - player_px) + (a.py - player_py) * (a.py - player_py));
-
-                a.px += (a.radius + player_radius - dis) * (a.px - player_px) / dis;
-                a.py += (a.radius + player_radius - dis) * (a.py - player_py) / dis;
-
-                a.vx = (a.px - player_px) * 0.04;
-                a.vy = (a.py - player_py) * 0.04;
-            }
-        }
         if (player.dead())
             break;
 
@@ -173,39 +188,79 @@ void Game::new_game()
         asteroids.update(elapsed);
         player.update(elapsed);
 
-        // Stage 1
-        if (timer.get_ticks() > 15000 && stage == 0) {
-            timer.set_interval(1000);
-            stage = 1;
-        }
-        // Stage 2
-        if (timer.get_ticks() > 25000 && stage == 1) {
-          timer.set_interval(800);
-          stage = 2;
-        }
-        // Stage 3
-        if (timer.get_ticks() > 35000 && stage == 1) {
-          timer.set_interval(500);
-          stage = 2;
-        }
-
+        set_stage(stage, timer);
         SDL_RenderClear(renderer);
 
-        // Game screen
+        // Render Game
         SDL_RenderSetViewport(renderer, &game_screen);
-        SDL_RenderCopy(renderer, textures[TEXTURE_BACKGROUND], NULL, NULL);
-        SDL_RenderCopy(renderer, text, NULL, NULL);
-        asteroids.render(renderer, textures[TEXTURE_ASTEROID]);
-        player.render(renderer, textures);
+        SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_BACKGROUND], NULL, NULL);
+        asteroids.render(renderer, textures_img[TEXTURE_IMG_ASTEROID]);
+        player.render(renderer, textures_img);
 
+        // Render UI
         SDL_RenderSetViewport(renderer, &real_screen);
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
         SDL_RenderDrawLine(renderer, GAME_WIDTH, 0, GAME_WIDTH, GAME_HEIGHT);
         SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0);
 
+        for (int i = 0; i < TEXTURE_TEXT_NUM; ++i) {
+            SDL_RenderCopy(renderer, textures_text[i], NULL, &text_pos[i]);
+        }
+
+        render_text(to_string(score), stat_pos[TEXTURE_TEXT_SCORE]);
+        render_text(to_string(stage), stat_pos[TEXTURE_TEXT_STAGE]);
+        render_text(to_string(player.get_lives()), stat_pos[TEXTURE_TEXT_LIVES]);
+
+        SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_WASD], NULL, &wasd_pos);
         SDL_RenderPresent(renderer);
 
-        SDL_Delay( fps_sleep(timer.sec_since_mark()) );
+        SDL_Delay(fps_sleep(timer.sec_since_mark()));
     }
     return;
+}
+
+void Game::set_stage(int& stage, Timer& timer)
+{
+    // Stage 1
+    if (timer.get_ticks() > 15000 && stage == 0) {
+        timer.set_interval(1000);
+        stage = 1;
+    }
+    // Stage 2
+    if (timer.get_ticks() > 25000 && stage == 1) {
+        timer.set_interval(800);
+        stage = 2;
+    }
+    // Stage 3
+    if (timer.get_ticks() > 35000 && stage == 2) {
+        timer.set_interval(500);
+        stage = 3;
+    }
+    // Stage 4
+    if (timer.get_ticks() > 50000 && stage == 3) {
+        timer.set_interval(200);
+        stage = 4;
+    }
+}
+
+void Game::pause()
+{
+    SDL_Event e;
+    while (true) {
+      SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_PAUSE], NULL, NULL);
+        SDL_RenderPresent(renderer);
+        while (SDL_WaitEvent(&e)) {
+            if (e.type == SDL_KEYDOWN) {
+                switch (e.key.keysym.sym) {
+                case SDLK_ESCAPE:
+                    game_state = GAME_STATE_MENU;
+                    return;
+                case SDLK_RETURN:
+                    game_state = GAME_STATE_PLAYING;
+                    return;
+                }
+            }
+        }
+    }
 }
