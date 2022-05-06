@@ -1,4 +1,4 @@
-#include "../include/Game.h"
+#include "Game.h"
 
 SDL_Texture* Game::load_img_texture(string path)
 {

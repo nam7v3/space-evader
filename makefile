@@ -5,7 +5,6 @@ SRC = $(wildcard ${SRC_DIR}/*.cpp)
 CC = g++
 FLAGS = -w -Wall -g -O3 -I $(INCLUDE)
 LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
-MAKEFLAGS := --jobs=$(shell nproc)
 
 all:
 	$(CC) $(FLAGS) $(LINKER_FLAGS) -o $(TARGET) $(SRC)

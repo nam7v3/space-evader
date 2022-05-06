@@ -1,4 +1,4 @@
-#include "../include/Player.h"
+#include "Player.h"
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keyboard.h>
 #include <SDL2/SDL_render.h>

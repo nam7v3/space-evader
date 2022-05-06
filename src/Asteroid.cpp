@@ -1,5 +1,5 @@
-#include "../include/Asteroid.h"
-#include "../include/Game.h"
+#include "Asteroid.h"
+#include "Game.h"
 #include <SDL2/SDL_render.h>
 
 bool outside(const Asteroid& a)

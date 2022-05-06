@@ -7,9 +7,9 @@
 #include <random>
 #include <string>
 
-#include "../include/Asteroid.h"
-#include "../include/Player.h"
-#include "../include/Timer.h"
+#include "Asteroid.h"
+#include "Player.h"
+#include "Timer.h"
 using namespace std;
 
 const int GAME_HEIGHT = 700;
@@ -38,14 +38,13 @@ const SDL_Rect real_screen = {
 #define TEXTURE_IMG_MENU 5
 #define TEXTURE_IMG_WASD 6
 #define TEXTURE_IMG_PAUSE 7
-#define TEXTURE_IMG_ESC 8 
+#define TEXTURE_IMG_ESC 8
 #define TEXTURE_IMG_NUM 9
-
 
 #define UI_PADDING 10
 
-const SDL_Rect wasd_pos = {GAME_WIDTH + UI_PADDING, GAME_HEIGHT / 2 - 40, 148, 100};
-const SDL_Rect esc_pos = {GAME_WIDTH + UI_PADDING * 2, GAME_HEIGHT - 150, 60, 60};
+const SDL_Rect wasd_pos = { GAME_WIDTH + UI_PADDING, GAME_HEIGHT / 2 - 40, 148, 100 };
+const SDL_Rect esc_pos = { GAME_WIDTH + UI_PADDING * 2, GAME_HEIGHT - 150, 60, 60 };
 
 #define MENU_PLAY 0
 #define MENU_QUIT 1
@@ -71,7 +70,7 @@ public:
     void new_game();
     void main_menu();
     void pause();
-    void set_stage(int &stage, Timer &timer);
+    void set_stage(int& stage, Timer& timer);
     void save_high_score(int score);
 
     SDL_Texture* load_img_texture(string path);
