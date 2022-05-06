@@ -15,9 +15,10 @@ SDL_Texture* Game::load_img_texture(string path)
     return texture;
 }
 
-int Game::render_text(string text, const SDL_Rect& dst)
+int Game::render_text(string text, int x, int y)
 {
     SDL_Texture* texture = load_text_texture(text);
+    SDL_Rect dst = { x, y, font_size * (int)text.length(), 2 * font_size };
     SDL_RenderCopy(renderer, texture, NULL, &dst);
     SDL_DestroyTexture(texture);
     return 0;
@@ -68,7 +69,7 @@ Game::Game()
         exit(1);
     }
     // Import font
-    font = TTF_OpenFont(font_path.c_str(), font_height);
+    font = TTF_OpenFont(font_path.c_str(), font_size);
     if (!font) {
         cerr << "Font: " << TTF_GetError();
         exit(1);
@@ -82,23 +83,12 @@ Game::Game()
             exit(1);
         }
     }
-
-    for (int i = 0; i < TEXTURE_TEXT_NUM; ++i) {
-        textures_text[i] = load_text_texture(text[i]);
-        if (!textures_text[i]) {
-            cerr << "Failed to load text texture:" << SDL_GetError();
-            exit(1);
-        }
-    }
 }
 
 Game::~Game()
 {
     for (int i = 0; i < TEXTURE_IMG_NUM; ++i) {
         SDL_DestroyTexture(textures_img[i]);
-    }
-    for (int i = 0; i < TEXTURE_TEXT_NUM; ++i) {
-        SDL_DestroyTexture(textures_text[i]);
     }
     SDL_DestroyWindow(window);
     IMG_Quit();
@@ -117,6 +107,9 @@ void Game::main_menu()
         else
             SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_MENU], &texture_menu[MENU_QUIT],
                 NULL);
+        if (best_score) {
+            render_text("BEST: " + to_string(best_score), 300, 500);
+        }
         SDL_RenderPresent(renderer);
         SDL_WaitEvent(&e);
         if (e.type == SDL_QUIT) {
@@ -180,8 +173,10 @@ void Game::new_game()
 
         player.check_asteroid_collision(asteroids.get_list());
 
-        if (player.dead())
+        if (player.dead()) {
+            best_score = max(score, best_score);
             break;
+        }
 
         score = timer.get_ticks() / 1000;
 
@@ -203,15 +198,14 @@ void Game::new_game()
         SDL_RenderDrawLine(renderer, GAME_WIDTH, 0, GAME_WIDTH, GAME_HEIGHT);
         SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0);
 
-        for (int i = 0; i < TEXTURE_TEXT_NUM; ++i) {
-            SDL_RenderCopy(renderer, textures_text[i], NULL, &text_pos[i]);
-        }
-
-        render_text(to_string(score), stat_pos[TEXTURE_TEXT_SCORE]);
-        render_text(to_string(stage), stat_pos[TEXTURE_TEXT_STAGE]);
-        render_text(to_string(player.get_lives()), stat_pos[TEXTURE_TEXT_LIVES]);
+        render_text("SCORE: " + to_string(score), GAME_WIDTH + UI_PADDING, 0);
+        render_text("LIVES: " + to_string(player.get_lives()), GAME_WIDTH + UI_PADDING, (font_size * 2 + UI_PADDING));
+        render_text("STAGE: " + to_string(stage), GAME_WIDTH + UI_PADDING, (font_size * 2 + UI_PADDING) * 2);
+        render_text("MOVEMENT", GAME_WIDTH + UI_PADDING, (font_size * 2 + UI_PADDING) * 5);
 
         SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_WASD], NULL, &wasd_pos);
+        render_text("Pause", GAME_WIDTH + UI_PADDING, GAME_HEIGHT - 200);
+        SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_ESC], NULL, &esc_pos);
         SDL_RenderPresent(renderer);
 
         SDL_Delay(fps_sleep(timer.sec_since_mark()));
@@ -247,7 +241,7 @@ void Game::pause()
 {
     SDL_Event e;
     while (true) {
-      SDL_RenderClear(renderer);
+        SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, textures_img[TEXTURE_IMG_PAUSE], NULL, NULL);
         SDL_RenderPresent(renderer);
         while (SDL_WaitEvent(&e)) {
@@ -263,4 +257,8 @@ void Game::pause()
             }
         }
     }
+}
+
+void Game::save_high_score(int score)
+{
 }

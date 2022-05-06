@@ -41,35 +41,11 @@ const SDL_Rect real_screen = {
 #define TEXTURE_IMG_ESC 8 
 #define TEXTURE_IMG_NUM 9
 
-#define TEXTURE_TEXT_SCORE 0
-#define TEXTURE_TEXT_STAGE 1
-#define TEXTURE_TEXT_LIVES 2
-#define TEXTURE_TEXT_MOVEMENT 3
-#define TEXTURE_TEXT_PAUSE 4
-#define TEXTURE_TEXT_NUM 5
-
-const string text[] = {
-    "SCORE: ", "STAGE: ", "LIVES: ", "MOVEMENT", "PAUSE",
-};
 
 #define UI_PADDING 10
 
-const SDL_Rect text_pos[] = {
-    {GAME_WIDTH + UI_PADDING, 0, 70, 70},
-    {GAME_WIDTH + UI_PADDING, 70 + UI_PADDING, 70, 70},
-    {GAME_WIDTH + UI_PADDING, (70 + UI_PADDING) * 2, 70, 70},
-    {GAME_WIDTH + UI_PADDING, (70 + UI_PADDING) * 3, 160, 70},
-    {GAME_WIDTH + UI_PADDING, GAME_HEIGHT / 2 + 110, 70, 70},
-};
-
-const SDL_Rect wasd_pos = {GAME_WIDTH + 20, GAME_HEIGHT / 2 - 40, 150, 150};
-
-const SDL_Rect stat_pos[] = {
-    { GAME_WIDTH + UI_PADDING + 70, 0, 70, 70 },
-    { GAME_WIDTH + UI_PADDING + 70, 70 + UI_PADDING, 70, 70 },
-    { GAME_WIDTH + UI_PADDING + 70, (70 + UI_PADDING) * 2, 70, 70 },
-};
-
+const SDL_Rect wasd_pos = {GAME_WIDTH + UI_PADDING, GAME_HEIGHT / 2 - 40, 148, 100};
+const SDL_Rect esc_pos = {GAME_WIDTH + UI_PADDING * 2, GAME_HEIGHT - 150, 60, 60};
 
 #define MENU_PLAY 0
 #define MENU_QUIT 1
@@ -77,15 +53,15 @@ const SDL_Rect stat_pos[] = {
 #define GAME_STATE_MENU 0
 #define GAME_STATE_PAUSE 1
 #define GAME_STATE_PLAYING 2
+
 const SDL_Rect texture_menu[]
     = { { 0, 0, 700, 700 }, { 700, 0, 700, 700 } };
-
 
 const SDL_Color defautl_text_color = { 0xff, 0xff, 0xff };
 
 const string resources_path = "resources/";
 const string font_path = resources_path + "font.ttf";
-const int font_height = 16;
+const int font_size = 20;
 
 class Game {
 public:
@@ -96,18 +72,19 @@ public:
     void main_menu();
     void pause();
     void set_stage(int &stage, Timer &timer);
+    void save_high_score(int score);
 
     SDL_Texture* load_img_texture(string path);
-    int render_text(string text, const SDL_Rect& dst);
+    int render_text(string text, int x, int y);
     SDL_Texture* load_text_texture(string text);
 
 private:
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Texture* textures_img[TEXTURE_IMG_NUM] = { NULL };
-    SDL_Texture* textures_text[TEXTURE_TEXT_NUM] = { NULL };
     TTF_Font* font;
-  int game_state = GAME_STATE_MENU;
+    int game_state = GAME_STATE_MENU;
+    int best_score = 0;
     bool running;
     int menu = 0;
 };
