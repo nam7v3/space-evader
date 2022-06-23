@@ -11,7 +11,7 @@ Game né thiên thạch đơn giản
 
 
 ## Installation
-Hiện tại chỉ tải được trên linux.
+Hiện tại chỉ tải được trên linux. Cần cmake.
 ```sh
 git clone https://github.com/nam7v3/space-evader 
 cd space-evader
