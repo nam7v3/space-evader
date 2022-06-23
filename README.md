@@ -17,7 +17,7 @@ git clone https://github.com/nam7v3/space-evader
 cd space-evader
 mkdir build
 cd build
-../cmake 
+cmake ..
 make
 ./space-evader
 ```
