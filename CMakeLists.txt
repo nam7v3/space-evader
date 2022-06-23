@@ -11,7 +11,7 @@ target_sources(space-evader
   PUBLIC src/Asteroid.cpp
   PUBLIC src/Timer.cpp)
 
-add_compile_options(-g -O3)
+add_compile_options(-O2)
 
 target_include_directories(space-evader PUBLIC include/)
 
